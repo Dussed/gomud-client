@@ -1,20 +1,33 @@
 package level
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"strconv"
-
-	"github.com/dussed/gomud-client/levels/leveldetail"
+	"reflect"
 )
 
 type Level struct {
 }
 
+type levelFormat struct {
+	Name      string
+	LevelData []levelLine
+}
+
+type levelLine []byte
+
 func Load(name string) error {
-	fp, err := filepath.Abs("./levels/" + name + ".level")
+	fp, err := filepath.Abs("./levels/" + name + ".json")
 	dat, err := ioutil.ReadFile(fp)
+
+	var parsed levelFormat
+
+	err = json.Unmarshal(dat, &parsed)
+
+	// fmt.Println(parsed)
+	// return nil
 
 	// breakChars := []byte{10}
 
@@ -22,20 +35,24 @@ func Load(name string) error {
 		return err
 	}
 
-	for _, tileData := range dat {
+	for _, stageLine := range parsed.LevelData {
 
-		tileId, err := strconv.Atoi(string(tileData))
+		// tileID, err := strconv.Atoi(string(tileData))
 
 		if err != nil {
 			fmt.Errorf(err.Error())
 		}
 
+		fmt.Println(reflect.TypeOf(stageLine[0]))
+
+		fmt.Println(stageLine)
+
 		// Is it line break time?
-		if tileData == 10 {
-			fmt.Println()
-		} else {
-			fmt.Print(leveldetail.GetTile(tileId).Character)
-		}
+		// if tileData == 10 {
+		// 	fmt.Println()
+		// } else {
+		// 	fmt.Print(leveldetail.GetTile(tileId).Character)
+		// }
 
 	}
 
